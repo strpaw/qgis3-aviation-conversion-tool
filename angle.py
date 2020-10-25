@@ -133,3 +133,30 @@ class Angle:
         elif isinstance(angle, (float, int)):
             if Angle.is_angle_within_range(angle, angle_type):
                 return angle
+
+    @staticmethod
+    def dmsh_parts_to_dd(dmsh_parts):
+        """ Convert coordinates parts into degrees minutes format.
+        Note: If angle is within range, example longitude <-180, 180> will be check in separated method.
+        :param dmsh_parts: tuple of degrees (int), minutes (int), seconds (float) and hemisphere character (str)
+        :return: dd: float
+        """
+        d, m, s, h = dmsh_parts
+        if (0 <= m < 60) and (0 <= s < 60):
+            dd = d + m / 60 + s / 3600
+            if h in ['W', 'S']:
+                return -dd
+            elif h in ['N', 'E']:
+                return dd
+
+    @staticmethod
+    def dms_parts_to_dd(dms_parts):
+        """ Convert coordinates parts into degrees minutes format.
+        Note: If angle is within range, example longitude <-180, 180> will be check in separated method.
+        :param dms_parts: tuple of degrees (int), minutes (int), seconds (float)
+        :return: dd: float
+        """
+        d, m, s = dms_parts
+        if (0 <= m < 60) and (0 <= s < 60):
+            dd = d + m / 60 + s / 3600
+            return dd

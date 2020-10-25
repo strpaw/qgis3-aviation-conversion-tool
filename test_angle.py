@@ -77,3 +77,17 @@ class AngleTests(unittest.TestCase):
         self.assertEqual(0, Angle.check_dd_format(0, AT_BEARING))
         self.assertEqual(25.44, Angle.check_dd_format('25,44', AT_BEARING))
         self.assertEqual(None, Angle.check_dd_format('361,0', AT_BEARING))
+
+    def test_dmsh_parts_to_dd(self):
+        self.assertEqual(None, Angle.dmsh_parts_to_dd((100, 61, 59, 'W')))
+        self.assertEqual(None, Angle.dmsh_parts_to_dd((100, 0, 60, 'E')))
+        self.assertEqual(None, Angle.dmsh_parts_to_dd((100, -1, 0, 'S')))
+        self.assertEqual(None, Angle.dmsh_parts_to_dd((100, 5, 10, 'A')))
+        self.assertEqual(100.59555555555555, Angle.dmsh_parts_to_dd((100, 35, 44, 'N')))
+        self.assertEqual(-100.59555555555555, Angle.dmsh_parts_to_dd((100, 35, 44, 'W')))
+
+    def test_dms_parts_to_dd(self):
+        self.assertEqual(None, Angle.dms_parts_to_dd((100, 61, 59)))
+        self.assertEqual(None, Angle.dms_parts_to_dd((100, 0, 60)))
+        self.assertEqual(None, Angle.dms_parts_to_dd((100, -1, 0)))
+        self.assertEqual(100.59555555555555, Angle.dms_parts_to_dd((100, 35, 44)))
