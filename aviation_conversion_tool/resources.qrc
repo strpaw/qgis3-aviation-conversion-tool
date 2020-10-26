@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/aviation_conversion_tool" >
+        <file>icon.png</file>
+    </qresource>
+</RCC>
