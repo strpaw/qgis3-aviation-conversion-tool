@@ -2,7 +2,7 @@
 distance.py
 Distance module provides functionality to distance validation and conversion
 """
-from const import *
+from aviation_conversion_tool.aviation_gis_tools.const import *
 
 
 class Distance:

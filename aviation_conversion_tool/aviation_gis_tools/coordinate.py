@@ -1,5 +1,5 @@
 import re
-from angle import *
+from aviation_conversion_tool.aviation_gis_tools.angle import *
 
 # Note: Patterns does not take into account if coordinate is valid or not,
 # for example if longitude does not exceed 180 degrees.

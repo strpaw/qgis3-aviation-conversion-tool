@@ -1,6 +1,6 @@
 import unittest
-from const import *
-from distance import Distance
+from aviation_conversion_tool.aviation_gis_tools.const import *
+from aviation_conversion_tool.aviation_gis_tools.distance import Distance
 
 
 class DistanceTests(unittest.TestCase):
@@ -58,7 +58,7 @@ class DistanceTests(unittest.TestCase):
         self.assertEqual('Distance value error.', d.err_msg)
 
     def test_error_message_value_and_uom_error(self):
-        d = Distance('', 'TEST')
+        d = Distance('', '../test')
         self.assertEqual('Distance UOM error.Distance value error.', d.err_msg)
 
     def test_convert_dist_to_m(self):
