@@ -30,7 +30,11 @@ from .resources import *
 # Import the code for the dialog
 from .aviation_conversion_tool_dialog import AviationConversionToolDialog
 import os.path
+from .aviation_gis_tools.distance import *
+from .aviation_gis_tools.coordinate import *
+from .aviation_gis_tools.arinc424_coordinate_conversion import *
 from .aviation_gis_tools.speeds import *
+
 
 class AviationConversionTool:
     """QGIS Plugin Implementation."""
@@ -179,6 +183,93 @@ class AviationConversionTool:
                 action)
             self.iface.removeToolBarIcon(action)
 
+    def distance_conversion(self):
+        unit_from = self.dlg.comboBoxDistanceUOMInput.currentText()
+        unit_to = self.dlg.comboBoxDistanceUOMOutput.currentText()
+        d = Distance(src_dist=self.dlg.lineEditDistanceValueInput.text().strip(),
+                     src_uom=unit_from)
+
+        if d.is_valid:
+            dist_output = round(d.convert_distance_to_uom(unit_to), 3)
+            self.dlg.lineEditDistanceValueOutput.setText("{:.3f}".format(dist_output))
+        else:
+            self.dlg.lineEditDistanceValueOutput.clear()
+            QMessageBox.critical(QWidget(), "Message",
+                                 "Input value error: {}. Number > 0 required!".format(self.dlg.lineEditDistanceValueInput.text()))
+
+    def longitude_to_dd(self):
+        lon_src = self.dlg.lineEditLongitudeToDecimalInput.text().strip()
+        lon = Coordinate(lon_src, AT_LONGITUDE)
+        dd = lon.convert_to_dd()
+        if dd is not None:
+            self.dlg.lineEditLongitudeToDecimalOutput.setText(str(dd))
+        else:
+            self.dlg.lineEditLongitudeToDecimalOutput.clear()
+            QMessageBox.critical(QWidget(), "Message",
+                                 "Input value error: {}. Not supported coordinate format "
+                                 "or longitude error!".format(lon_src))
+
+    def latitude_to_dd(self):
+        lat_src = self.dlg.lineEditLatitudeToDecimalInput.text().strip()
+        lat = Coordinate(lat_src, AT_LATITUDE)
+        dd = lat.convert_to_dd()
+        if dd is not None:
+            self.dlg.lineEditLatitudeToDecimalOutput.setText(str(dd))
+        else:
+            self.dlg.lineEditLatitudeToDecimalOutput.clear()
+            QMessageBox.critical(QWidget(), "Message",
+                                 "Input value error: {}. Not supported coordinate format "
+                                 "or latitude error!".format(lat_src))
+
+    def longitude_to_dms(self):
+        lon_src = self.dlg.lineEditLongitudeFromDecimalInput.text()
+        lon = Coordinate(lon_src, AT_LONGITUDE)
+        dd = lon.check_dd_format(lon_src, AT_LONGITUDE)
+        if dd is not None:
+            lon_dms = lon.dd_to_dms_string(dd, AT_LONGITUDE)
+            self.dlg.lineEditLongitudeFromDecimalOutput.setText(lon_dms)
+        else:
+            self.dlg.lineEditLongitudeFromDecimalOutput.clear()
+            QMessageBox.critical(QWidget(), "Message",
+                                 "Input value error: {}. Longitude in decimal degrees format expected!".format(lon_src))
+
+    def latitude_to_dms(self):
+        lat_src = self.dlg.lineEditLatitudeFromDecimalInput.text()
+        lat = Coordinate(lat_src, AT_LATITUDE)
+        dd = lat.check_dd_format(lat_src, AT_LATITUDE)
+        if dd is not None:
+            lat_dms = lat.dd_to_dms_string(dd, AT_LATITUDE)
+            self.dlg.lineEditLatitudeFromDecimalOutput.setText(lat_dms)
+        else:
+            self.dlg.lineEditLatitudeFromDecimalInput.clear()
+            QMessageBox.critical(QWidget(), "Message",
+                                 "Input value error: {}. Latitude in decimal degrees format expected!".format(lat_src))
+
+    def from_arinc424_conversion(self):
+        arinc = Arinc424CoordinatesConversion()
+
+        arinc_code = self.dlg.lineEditFromArinc424Input.text().strip()
+        lonlat = arinc.arinc424_to_coordinates(arinc_code)
+        if lonlat:
+            self.dlg.lineEditFromArinc424Output.setText(lonlat)
+        else:
+            self.dlg.lineEditFromArinc424Output.clear()
+            QMessageBox.critical(QWidget(), "Message",
+                                 "Value {} is not ARINC424 code for full degrees!".format(arinc_code))
+
+    def to_arinc424_conversion(self):
+        arinc = Arinc424CoordinatesConversion()
+        lon = self.dlg.lineEditToArinc424Longitude.text().strip()
+        lat = self.dlg.lineEditToArinc424Latitude.text().strip()
+
+        arinc_code = arinc.coord_to_arinc424(lon, lat)
+        if arinc_code:
+            self.dlg.lineEditToArinc424Output.setText(arinc_code)
+        else:
+            self.dlg.lineEditToArinc424Output.clear()
+            QMessageBox.critical(QWidget(), "Message",
+                                 "Longitude and latitude full degrees required!")
+
     def speed_conversion(self):
         unit_from = self.dlg.comboBoxSpeedUOMInput.currentText()
         unit_to = self.dlg.comboBoxSpeedUOMOutput.currentText()
@@ -186,12 +277,12 @@ class AviationConversionTool:
         if unit_from != unit_to:
             try:
                 speed_from = float(self.dlg.lineEditSpeedValueInput.text().strip())
-            except ValueError:
-                QMessageBox.critical(QWidget(), "Message", "Value {} is not a number!".format(self.dlg.lineEditSpeedValueInput.text()))
-            else:
                 speed_to = round(convert_speed(speed_from, unit_from, unit_to), 3)
                 self.dlg.lineEditSpeedValueOutput.setText("{:.3f}".format(speed_to))
-
+            except ValueError:
+                self.dlg.lineEditSpeedValueOutput.clear()
+                QMessageBox.critical(QWidget(), "Message",
+                                     "Value {} is not a number!".format(self.dlg.lineEditSpeedValueInput.text()))
 
     def run(self):
         """Run method that performs all the real work"""
@@ -201,6 +292,13 @@ class AviationConversionTool:
         if self.first_start == True:
             self.first_start = False
             self.dlg = AviationConversionToolDialog()
+            self.dlg.pushButtonDistanceConversion.clicked.connect(self.distance_conversion)
+            self.dlg.pushButtonLongitudeToDDConversion.clicked.connect(self.longitude_to_dd)
+            self.dlg.pushButtonLatitudeToDDConversion.clicked.connect(self.latitude_to_dd)
+            self.dlg.pushButtonLongitudeFromDDConversion.clicked.connect(self.longitude_to_dms)
+            self.dlg.pushButtonLatitudeFromDDConversion.clicked.connect(self.latitude_to_dms)
+            self.dlg.pushButtonFromArinc424Conversion.clicked.connect(self.from_arinc424_conversion)
+            self.dlg.pushButtonToArinc424Conversion.clicked.connect(self.to_arinc424_conversion)
             self.dlg.pushButtonSpeedConversion.clicked.connect(self.speed_conversion)
 
         # show the dialog
