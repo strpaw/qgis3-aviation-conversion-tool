@@ -23,14 +23,14 @@
 """
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction
+from qgis.PyQt.QtWidgets import QAction, QWidget, QMessageBox
 
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
 from .aviation_conversion_tool_dialog import AviationConversionToolDialog
 import os.path
-
+from .aviation_gis_tools.speeds import *
 
 class AviationConversionTool:
     """QGIS Plugin Implementation."""
@@ -179,6 +179,19 @@ class AviationConversionTool:
                 action)
             self.iface.removeToolBarIcon(action)
 
+    def speed_conversion(self):
+        unit_from = self.dlg.comboBoxSpeedUOMInput.currentText()
+        unit_to = self.dlg.comboBoxSpeedUOMOutput.currentText()
+
+        if unit_from != unit_to:
+            try:
+                speed_from = float(self.dlg.lineEditSpeedValueInput.text().strip())
+            except ValueError:
+                QMessageBox.critical(QWidget(), "Message", "Value {} is not a number!".format(self.dlg.lineEditSpeedValueInput.text()))
+            else:
+                speed_to = round(convert_speed(speed_from, unit_from, unit_to), 3)
+                self.dlg.lineEditSpeedValueOutput.setText("{:.3f}".format(speed_to))
+
 
     def run(self):
         """Run method that performs all the real work"""
@@ -188,6 +201,7 @@ class AviationConversionTool:
         if self.first_start == True:
             self.first_start = False
             self.dlg = AviationConversionToolDialog()
+            self.dlg.pushButtonSpeedConversion.clicked.connect(self.speed_conversion)
 
         # show the dialog
         self.dlg.show()
