@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Polygon from CSV - QGIS Plugin documentation</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div id="header">
+      <h1>Aviation Conversion Tool 0.1 - plugin documentation</h1>
+    </div>
+
+    <div id="menu" style="float:left;">
+      <h3>Table of contents</h3>
+    <ul class="menu-items">
+      <li><a href="#description">Description</a></li>
+      <li><a href="#usage">Usage</a></li>
+      <ul class="menu-items">
+        <li><a href="#distance">Distance conversion</a></li>
+        <li><a href="#coordinates">Coordinates conversion</a></li>
+        <ul class="menu-items">
+          <li><a href="#coordinates_to_dd">To decimal degrees</a></li>
+          <li><a href="#coordinates_from_dd">From decimal degrees</a></li>
+        </ul>
+        <li><a href="#arinc424">Full degrees ARINC 424 format conversion</a></li>
+        <ul class="menu-items">
+          <li><a href="#from_arinc424">To longitude, latitude</a></li>
+          <li><a href="#to_arinc424">To ARINC424 code</a></li>
+        </ul>
+        <li><a href="#speed">Speed conversion</a></li>
+      </ul>
+    </ul>
+
+    </div>
+
+    <div id="main_content" style="float:left;">
+     <h3 id="description">Description</h3>
+     <p>Aviation Conversion Tool plugin allows user to convert values such as distance, coordinate and speed<br> among
+     various formats and units of measure that are commonly used in aviation industry.</p>
+     <img src="aviation_conversion_tool_exmaples.PNG" alt="">
+
+     <h3 id="usage">Usage</h3>
+       <p>To convert value from one unit of measure to another one or from one format to another one just:</p>
+       <ol>
+         <li>Enter value in soource/original unit of measure or format.</li>
+         <li>Choose soource/original and desired unit of measure is necessary - for distance and speeds conversion.</li>
+         <li>Hit convert button <img src="convert_button.PNG" alt="convert_button"> to convert value to desired unit of measure or format.</li>
+       </ol>
+
+       <p> In case source value does is not valie or not suppoerted format, message with error will be shown, for example:</p>
+       <ul>
+         <li>Distance error - positive number required</li>
+         <li>Latitude not supperted format:</li>
+       </ul>
+       <p>For more information about each conversion option such as supported coordnate formats refer to approptiate part of this page.</p>
+
+
+    <h3 id="distance">Distance conversion</h3>
+    <h3 id="coordinates">Coordinates conversion</h3>
+
+       <h4 id="coordinates_to_dd">To decimal degrees</h4>
+        <p>Supported coordinate formats:</p>
+        <ul>
+          <li>degrees, minutes seconds (DMS) 'compacted' with direction (hemisphere) prefix and sufix, examples: S233021.5555, 1233021.5555W</li>
+          <li>degrees, minutes seconds (DMS) 'separated' with direction (hemisphere) prefix and sufix, examples: W 003 09 02.111, 3 9 2.111N</li>
+        </ul>
+
+        <h4 id="coordinates_from_dd">From decimal degress</h4>
+
+        <h3 id="arinc424">Full degrees ARINC 424 format conversion</h4>
+        <h4 id="from_arinc424">To longitude, latitude</h3>
+        <h4 id="to_arinc424">To ARINC424 code</h3>
+
+
+          <p>To convert coordinate pair to ARINC 424 code enter longitude and latitude value as full degress with hemisphere suffix:</p>
+          <ul>
+            <li>longitude: DDDH, example: <i>020E, 121W</i></li>
+            <li>latitude: DDH, example: <i>67N, 03S</i></li>
+          </ul>
+          <p>Notice that leading zeros are required</p>
+          <img src="to_arinc424.PNG" alt="">
+
+      <h3 id="speed">Speed conversion</h3>
+        <p>To convert speed from one unit to another one just:</p>
+          <ol>
+            <li>Enter source speed value. Value shule be a positive number.</li>
+            <li>Select  source unit of measure.</li>
+            <li>Select desired unit of measure.</li>
+            <li>Hit convert button <img src="convert_button.PNG" alt="convert_button">.</li>
+          </ol>
+    </div>
+
+
+
+  </body>
+</html>

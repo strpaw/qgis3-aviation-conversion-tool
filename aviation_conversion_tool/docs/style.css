@@ -1,0 +1,21 @@
+body {
+  background-color: #b1cdcd;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+#menu {
+  padding-left: 10px;
+  padding-right: 10px;
+  
+}
+
+#main_content {
+	background-color: #d0e1e1;
+	padding: 10px;
+}
+
+.menu-items {
+  list-style-type: none;
+  padding-left: 10px;
+}
