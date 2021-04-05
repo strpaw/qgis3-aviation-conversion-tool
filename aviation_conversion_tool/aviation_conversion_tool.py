@@ -274,15 +274,19 @@ class AviationConversionTool:
         unit_from = self.dlg.comboBoxSpeedUOMInput.currentText()
         unit_to = self.dlg.comboBoxSpeedUOMOutput.currentText()
 
-        if unit_from != unit_to:
-            try:
-                speed_from = float(self.dlg.lineEditSpeedValueInput.text().strip())
+        try:
+            speed_from = float(self.dlg.lineEditSpeedValueInput.text().strip())
+
+            if speed_from > 0:
                 speed_to = round(convert_speed(speed_from, unit_from, unit_to), 3)
                 self.dlg.lineEditSpeedValueOutput.setText("{:.3f}".format(speed_to))
-            except ValueError:
-                self.dlg.lineEditSpeedValueOutput.clear()
+            else:
                 QMessageBox.critical(QWidget(), "Message",
-                                     "Value {} is not a number!".format(self.dlg.lineEditSpeedValueInput.text()))
+                                     "Number > 0 required!".format(self.dlg.lineEditSpeedValueInput.text()))
+        except ValueError:
+            self.dlg.lineEditSpeedValueOutput.clear()
+            QMessageBox.critical(QWidget(), "Message",
+                                 "Number > 0 required!".format(self.dlg.lineEditSpeedValueInput.text()))
 
     def run(self):
         """Run method that performs all the real work"""
@@ -293,6 +297,9 @@ class AviationConversionTool:
             self.first_start = False
             self.dlg = AviationConversionToolDialog()
             self.dlg.pushButtonDistanceConversion.clicked.connect(self.distance_conversion)
+            self.dlg.comboBoxDistanceUOMInput.currentIndexChanged.connect(self.distance_conversion)
+            self.dlg.comboBoxDistanceUOMOutput.currentIndexChanged.connect(self.distance_conversion)
+            self.dlg.lineEditDistanceValueInput.textChanged.connect(self.dlg.lineEditDistanceValueOutput.clear)
             self.dlg.pushButtonLongitudeToDDConversion.clicked.connect(self.longitude_to_dd)
             self.dlg.pushButtonLatitudeToDDConversion.clicked.connect(self.latitude_to_dd)
             self.dlg.pushButtonLongitudeFromDDConversion.clicked.connect(self.longitude_to_dms)
@@ -300,6 +307,9 @@ class AviationConversionTool:
             self.dlg.pushButtonFromArinc424Conversion.clicked.connect(self.from_arinc424_conversion)
             self.dlg.pushButtonToArinc424Conversion.clicked.connect(self.to_arinc424_conversion)
             self.dlg.pushButtonSpeedConversion.clicked.connect(self.speed_conversion)
+            self.dlg.comboBoxSpeedUOMInput.currentIndexChanged.connect(self.speed_conversion)
+            self.dlg.comboBoxSpeedUOMOutput.currentIndexChanged.connect(self.speed_conversion)
+            self.dlg.lineEditSpeedValueInput.textChanged.connect(self.dlg.lineEditSpeedValueOutput.clear)
 
         # show the dialog
         self.dlg.show()
