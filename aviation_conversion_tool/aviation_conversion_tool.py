@@ -225,25 +225,27 @@ class AviationConversionTool:
         lon_src = self.dlg.lineEditLongitudeFromDecimalInput.text()
         lon = Coordinate(lon_src, AT_LONGITUDE)
         dd = lon.check_dd_format(lon_src, AT_LONGITUDE)
-        if dd is not None:
-            lon_dms = lon.dd_to_dms_string(dd, AT_LONGITUDE)
-            self.dlg.lineEditLongitudeFromDecimalOutput.setText(lon_dms)
-        else:
+
+        if dd is None:
             self.dlg.lineEditLongitudeFromDecimalOutput.clear()
             QMessageBox.critical(QWidget(), "Message",
                                  "Input value error: {}. Longitude in decimal degrees format expected!".format(lon_src))
+        else:
+            lon_dms = lon.dd_to_dms_string(dd, AT_LONGITUDE)
+            self.dlg.lineEditLongitudeFromDecimalOutput.setText(lon_dms)
 
     def latitude_to_dms(self):
         lat_src = self.dlg.lineEditLatitudeFromDecimalInput.text()
         lat = Coordinate(lat_src, AT_LATITUDE)
         dd = lat.check_dd_format(lat_src, AT_LATITUDE)
-        if dd is not None:
-            lat_dms = lat.dd_to_dms_string(dd, AT_LATITUDE)
-            self.dlg.lineEditLatitudeFromDecimalOutput.setText(lat_dms)
-        else:
-            self.dlg.lineEditLatitudeFromDecimalInput.clear()
+
+        if dd is None:
+            self.dlg.lineEditLatitudeFromDecimalOutput.clear()
             QMessageBox.critical(QWidget(), "Message",
                                  "Input value error: {}. Latitude in decimal degrees format expected!".format(lat_src))
+        else:
+            lat_dms = lat.dd_to_dms_string(dd, AT_LATITUDE)
+            self.dlg.lineEditLatitudeFromDecimalOutput.setText(lat_dms)
 
     def from_arinc424_conversion(self):
         arinc = Arinc424CoordinatesConversion()
@@ -296,16 +298,23 @@ class AviationConversionTool:
         if self.first_start == True:
             self.first_start = False
             self.dlg = AviationConversionToolDialog()
+
             self.dlg.pushButtonDistanceConversion.clicked.connect(self.distance_conversion)
             self.dlg.comboBoxDistanceUOMInput.currentIndexChanged.connect(self.distance_conversion)
             self.dlg.comboBoxDistanceUOMOutput.currentIndexChanged.connect(self.distance_conversion)
             self.dlg.lineEditDistanceValueInput.textChanged.connect(self.dlg.lineEditDistanceValueOutput.clear)
+
             self.dlg.pushButtonLongitudeToDDConversion.clicked.connect(self.longitude_to_dd)
             self.dlg.pushButtonLatitudeToDDConversion.clicked.connect(self.latitude_to_dd)
+
             self.dlg.pushButtonLongitudeFromDDConversion.clicked.connect(self.longitude_to_dms)
+            self.dlg.lineEditLongitudeFromDecimalInput.textChanged.connect(self.dlg.lineEditLongitudeFromDecimalOutput.clear)
             self.dlg.pushButtonLatitudeFromDDConversion.clicked.connect(self.latitude_to_dms)
+            self.dlg.lineEditLatitudeFromDecimalInput.textChanged.connect(self.dlg.lineEditLatitudeFromDecimalOutput.clear)
+
             self.dlg.pushButtonFromArinc424Conversion.clicked.connect(self.from_arinc424_conversion)
             self.dlg.pushButtonToArinc424Conversion.clicked.connect(self.to_arinc424_conversion)
+
             self.dlg.pushButtonSpeedConversion.clicked.connect(self.speed_conversion)
             self.dlg.comboBoxSpeedUOMInput.currentIndexChanged.connect(self.speed_conversion)
             self.dlg.comboBoxSpeedUOMOutput.currentIndexChanged.connect(self.speed_conversion)
