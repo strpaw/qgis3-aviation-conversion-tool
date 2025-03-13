@@ -26,7 +26,7 @@ from typing import Callable
 
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction, QWidget, QMessageBox
+from qgis.PyQt.QtWidgets import QAction
 
 # Initialize Qt resources from file resources.py
 from .resources import *  # pylint: disable=unused-wildcard-import, wildcard-import
@@ -42,29 +42,12 @@ from .aviation_gis_tools.coordinate import Coordinate
 from .aviation_gis_tools.arinc424_coordinate_conversion import Arinc424CoordinatesConversion
 from .aviation_gis_tools.speeds import convert_speed
 from .errors import (
-    AviationConversionBaseError,
     ARINC424ShorthandValueError,
     CoordinateFullDegreesError,
     CoordinateValueFormatError,
     NumberNotPositiveError
 )
-
-
-def show_dialog(msg: str) -> Callable:
-    """Show dialog box when input is incorrect.
-
-    :param msg: message to be displayed in dialog box.
-    :return:
-    """
-    def dec_show_dialog(f):
-        def wrapper_show_dialog(self):
-            try:
-                return f(self)
-            except AviationConversionBaseError:
-                QMessageBox.critical(QWidget(), "Message", msg)
-            return None
-        return wrapper_show_dialog
-    return dec_show_dialog
+from .decorators import show_dialog
 
 
 class AviationConversionTool:
