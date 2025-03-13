@@ -22,7 +22,6 @@
  ***************************************************************************/
 """
 import os.path
-from typing import Callable
 
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
@@ -32,22 +31,6 @@ from qgis.PyQt.QtWidgets import QAction
 from .resources import *  # pylint: disable=unused-wildcard-import, wildcard-import
 # Import the code for the dialog
 from .aviation_conversion_tool_dialog import AviationConversionToolDialog
-
-from .aviation_gis_tools.const import (
-    AT_LATITUDE,
-    AT_LONGITUDE
-)
-from .aviation_gis_tools.distance import Distance
-from .aviation_gis_tools.coordinate import Coordinate
-from .aviation_gis_tools.arinc424_coordinate_conversion import Arinc424CoordinatesConversion
-from .aviation_gis_tools.speeds import convert_speed
-from .errors import (
-    ARINC424ShorthandValueError,
-    CoordinateFullDegreesError,
-    CoordinateValueFormatError,
-    NumberNotPositiveError
-)
-from .decorators import show_dialog
 
 
 class AviationConversionTool:
@@ -197,119 +180,6 @@ class AviationConversionTool:
                 action)
             self.iface.removeToolBarIcon(action)
 
-    @show_dialog(msg="Distance must be a number > 0!")
-    def distance_conversion(self) -> None:
-        """Convert distance"""
-        unit_from = self.dlg.comboBoxDistanceUOMInput.currentText()
-        unit_to = self.dlg.comboBoxDistanceUOMOutput.currentText()
-        d = Distance(
-            src_dist=self.dlg.lineEditDistanceValueInput.text().strip(),
-            src_uom=unit_from
-        )
-        if not d.is_valid:
-            self.dlg.lineEditDistanceValueOutput.clear()
-            raise CoordinateValueFormatError
-
-        result = round(d.convert_distance_to_uom(unit_to), 3)
-        self.dlg.lineEditDistanceValueOutput.setText(f"{result:.3f}")
-
-    @show_dialog(msg="Longitude value error or not supported format!")
-    def longitude_to_dd(self):
-        """Convert Longitude from to decimal degrees format"""
-        lon_src = self.dlg.lineEditLongitudeToDecimalInput.text().strip()
-        lon = Coordinate(lon_src, AT_LONGITUDE)
-        dd = lon.convert_to_dd()
-        if dd is None:
-            self.dlg.lineEditLongitudeToDecimalOutput.clear()
-            raise CoordinateValueFormatError
-
-        self.dlg.lineEditLongitudeToDecimalOutput.setText(str(dd))
-
-    @show_dialog(msg="Latitude value error or not supported format!")
-    def latitude_to_dd(self) -> None:
-        """Convert latitude to decimal degrees format"""
-        lat_src = self.dlg.lineEditLatitudeToDecimalInput.text().strip()
-        lat = Coordinate(lat_src, AT_LATITUDE)
-        dd = lat.convert_to_dd()
-        if dd is None:
-            self.dlg.lineEditLatitudeToDecimalOutput.clear()
-            raise CoordinateValueFormatError
-
-        self.dlg.lineEditLatitudeToDecimalOutput.setText(str(dd))
-
-    @show_dialog(msg="Longitude in decimal degrees format expected!")
-    def longitude_to_dms(self) -> None:
-        """Convert longitude to degrees, minutes, seconds format"""
-        lon_src = self.dlg.lineEditLongitudeFromDecimalInput.text()
-        lon = Coordinate(lon_src, AT_LONGITUDE)
-        dd = lon.check_dd_format(lon_src, AT_LONGITUDE)
-
-        if dd is None:
-            self.dlg.lineEditLongitudeFromDecimalOutput.clear()
-            raise CoordinateValueFormatError
-
-        lon_dms = lon.dd_to_dms_string(dd, AT_LONGITUDE)
-        self.dlg.lineEditLongitudeFromDecimalOutput.setText(lon_dms)
-
-    @show_dialog(msg="Latitude in decimal degrees format expected!")
-    def latitude_to_dms(self):
-        """Convert latitude to degrees, minutes, seconds format"""
-        lat_src = self.dlg.lineEditLatitudeFromDecimalInput.text()
-        lat = Coordinate(lat_src, AT_LATITUDE)
-        dd = lat.check_dd_format(lat_src, AT_LATITUDE)
-
-        if dd is None:
-            self.dlg.lineEditLatitudeFromDecimalOutput.clear()
-            raise CoordinateValueFormatError
-
-        lat_dms = lat.dd_to_dms_string(dd, AT_LATITUDE)
-        self.dlg.lineEditLatitudeFromDecimalOutput.setText(lat_dms)
-
-    @show_dialog(msg="ARINC424 'shorthand' code for full degrees expected!")
-    def from_arinc424_conversion(self):
-        """Convert from ARINC 424 'short-hand' coordinates to degrees, minutes format"""
-        arinc = Arinc424CoordinatesConversion()
-
-        arinc_code = self.dlg.lineEditFromArinc424Input.text().strip()
-        lonlat = arinc.arinc424_to_coordinates(arinc_code)
-        if not lonlat:
-            self.dlg.lineEditFromArinc424Output.clear()
-            raise ARINC424ShorthandValueError
-
-        self.dlg.lineEditFromArinc424Output.setText(lonlat)
-
-    @show_dialog(msg="Longitude and latitude full degrees required!")
-    def to_arinc424_conversion(self):
-        """Convert from  coordinates to degrees, minutes format to ARINC 424 'short-hand' coordinates"""
-        arinc = Arinc424CoordinatesConversion()
-        lon = self.dlg.lineEditToArinc424Longitude.text().strip()
-        lat = self.dlg.lineEditToArinc424Latitude.text().strip()
-        arinc_code = arinc.coord_to_arinc424(lon, lat)
-
-        if not arinc_code:
-            self.dlg.lineEditToArinc424Output.clear()
-            raise CoordinateFullDegreesError
-
-        self.dlg.lineEditToArinc424Output.setText(arinc_code)
-
-    @show_dialog(msg="Speed must be a number > 0!")
-    def speed_conversion(self) -> None:
-        """ Convert speeds"""
-        try:
-            speed_from = float(self.dlg.lineEditSpeedValueInput.text().strip())
-            if speed_from <= 0:
-                raise NumberNotPositiveError
-        except ValueError as e:
-            self.dlg.lineEditSpeedValueOutput.clear()
-            raise NumberNotPositiveError from e
-
-        result = convert_speed(
-            speed=speed_from,
-            from_unit=self.dlg.comboBoxSpeedUOMInput.currentText(),
-            to_unit=self.dlg.comboBoxSpeedUOMOutput.currentText()
-        )
-        self.dlg.lineEditSpeedValueOutput.setText(f"{result:.3f}")
-
     def run(self):
         """Run method that performs all the real work"""
 
@@ -318,27 +188,6 @@ class AviationConversionTool:
         if self.first_start:
             self.first_start = False
             self.dlg = AviationConversionToolDialog()
-
-            self.dlg.pushButtonDistanceConversion.clicked.connect(self.distance_conversion)
-            self.dlg.comboBoxDistanceUOMInput.currentIndexChanged.connect(self.distance_conversion)
-            self.dlg.comboBoxDistanceUOMOutput.currentIndexChanged.connect(self.distance_conversion)
-            self.dlg.lineEditDistanceValueInput.textChanged.connect(self.dlg.lineEditDistanceValueOutput.clear)
-
-            self.dlg.pushButtonLongitudeToDDConversion.clicked.connect(self.longitude_to_dd)
-            self.dlg.pushButtonLatitudeToDDConversion.clicked.connect(self.latitude_to_dd)
-
-            self.dlg.pushButtonLongitudeFromDDConversion.clicked.connect(self.longitude_to_dms)
-            self.dlg.lineEditLongitudeFromDecimalInput.textChanged.connect(self.dlg.lineEditLongitudeFromDecimalOutput.clear)
-            self.dlg.pushButtonLatitudeFromDDConversion.clicked.connect(self.latitude_to_dms)
-            self.dlg.lineEditLatitudeFromDecimalInput.textChanged.connect(self.dlg.lineEditLatitudeFromDecimalOutput.clear)
-
-            self.dlg.pushButtonFromArinc424Conversion.clicked.connect(self.from_arinc424_conversion)
-            self.dlg.pushButtonToArinc424Conversion.clicked.connect(self.to_arinc424_conversion)
-
-            self.dlg.pushButtonSpeedConversion.clicked.connect(self.speed_conversion)
-            self.dlg.comboBoxSpeedUOMInput.currentIndexChanged.connect(self.speed_conversion)
-            self.dlg.comboBoxSpeedUOMOutput.currentIndexChanged.connect(self.speed_conversion)
-            self.dlg.lineEditSpeedValueInput.textChanged.connect(self.dlg.lineEditSpeedValueOutput.clear)
 
         # show the dialog
         self.dlg.show()
