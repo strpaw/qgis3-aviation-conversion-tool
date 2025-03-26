@@ -64,6 +64,7 @@ class AviationConversionToolDialog(QtWidgets.QDialog, FORM_CLASS):
         self.lineEditDistanceValueInput.textChanged.connect(self.lineEditDistanceValueOutput.clear)
 
         self.pushButtonToArinc424Conversion.clicked.connect(self.convert_to_arinc424)
+        self.lineEditFromArinc424Input.textChanged.connect(self.lineEditFromArinc424Output.clear)
 
         self.pushButtonLongitudeFromDDConversion.clicked.connect(self.convert_longitude_to_dms)
         self.lineEditLongitudeFromDecimalInput.textChanged.connect(
