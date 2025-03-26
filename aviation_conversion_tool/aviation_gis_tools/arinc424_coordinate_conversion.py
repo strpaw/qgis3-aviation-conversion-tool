@@ -22,13 +22,13 @@ class Arinc424CoordinatesConversion:
     REGEX_LATITUDE_DH_FULL_DEGREES = re.compile(r'''^(90|[0-8]\d)[NS]$''')
 
     # Regular expression for shorthand coordinates pair in ARINC424 system - full degrees
-    REGEXES_ARINC424 = {'LON_LESS_HUNDRED_REGEX': re.compile(r'''(?P<lat>\d{2})  # First two of latitude
+    REGEXES_ARINC424 = {'LON_LESS_HUNDRED_REGEX': re.compile(r'''^(?P<lat>\d{2})  # First two of latitude
                                                                  (?P<lon>\d{2})  # Second and third of longitude
-                                                                 (?P<letter>[NSEW])  # Letter designator 
+                                                                 (?P<letter>[NSEW])$  # Letter designator 
                                                             ''', re.VERBOSE),
-                        'LON_EQUAL_GRATER_HUNDRED_REGEX': re.compile(r'''(?P<lat>\d{2})  # First two of latitude
+                        'LON_EQUAL_GRATER_HUNDRED_REGEX': re.compile(r'''^(?P<lat>\d{2})  # First two of latitude
                                                                          (?P<letter>[NSEW])  # Letter designator 
-                                                                         (?P<lon>\d{2})  # Second and third of longitude
+                                                                         (?P<lon>\d{2})$  # Second and third of longitude
                                                                       ''', re.VERBOSE)}
 
     @staticmethod
