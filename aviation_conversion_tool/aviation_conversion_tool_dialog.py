@@ -78,6 +78,8 @@ class AviationConversionToolDialog(QtWidgets.QDialog, FORM_CLASS):
         self.pushButtonLatitudeToDDConversion.clicked.connect(self.convert_latitude_to_dd)
 
         self.pushButtonFromArinc424Conversion.clicked.connect(self.convert_from_arinc424)
+        self.lineEditToArinc424Longitude.textChanged.connect(self.lineEditToArinc424Output.clear)
+        self.lineEditToArinc424Latitude.textChanged.connect(self.lineEditToArinc424Output.clear)
 
         self.pushButtonSpeedConversion.clicked.connect(self.convert_speed)
         self.comboBoxSpeedUOMInput.currentIndexChanged.connect(self.convert_speed)
