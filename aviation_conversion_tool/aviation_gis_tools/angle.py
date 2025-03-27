@@ -90,6 +90,14 @@ class Angle:
         mm = int(m_whole_part)
         sec = round(s_part, prec)
 
+        if sec == 60:
+            sec = 0
+            mm += 1
+
+        if mm == 60:
+            mm = 0
+            dd += 1
+
         return sign(ang_dd), dd, mm, sec
 
     def dd_to_dms_string(self, ang_dd, ang_type, ang_format=AF_DMSH_ALL_SEP, prec=3):
