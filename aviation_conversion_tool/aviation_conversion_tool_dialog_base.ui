@@ -131,7 +131,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>From:</string>
+     <string>From</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_2">
@@ -677,7 +677,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>From:</string>
+     <string>From</string>
     </property>
    </widget>
   </widget>
